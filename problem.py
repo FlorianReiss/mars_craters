@@ -5,10 +5,42 @@ import pandas as pd
 
 import rampwf as rw
 import json
+from rampwf.prediction_types.base import BasePrediction
+from rampwf.score_types import BaseScoreType 
+
+from PVChecker import *
 
 
+class dummy_Predictions(BasePrediction):
+  def __init__(self, y_pred=None, y_true=None, n_samples=None):
+    if y_pred is not None:
+      self.y_pred = y_pred
+    elif y_true is not None:
+      self.y_pred = y_true
+    elif n_samples is not None:
+      self.y_pred = np.empty(n_samples, dtype=object)
+    else:
+     raise ValueError('Missing init argument: y_pred, y_true, or n_samples')
 
-class dummy_score():
+  def __str__(self):
+    return 'y_pred = {}'.format(self.y_pred)
+
+  @classmethod
+  def combine(cls, predictions_list, index_list=None):
+    if index_list is None:  # we combine the full list
+      index_list = range(len(predictions_list))
+    y_comb_list = [predictions_list[i].y_pred for i in index_list]
+
+    n_preds = len(y_comb_list[0])
+    y_preds_combined = np.empty(n_preds, dtype=object)
+    combined_predictions = cls(y_pred=y_preds_combined)
+    return combined_predictions
+
+  @property
+  def valid_indexes(self):
+    return True
+
+class dummy_score(BaseScoreType):
     is_lower_the_better = False
     minimum = 0.0
     maximum = 1.0
@@ -18,20 +50,20 @@ class dummy_score():
         self.precision = precision
 
     def __call__(self, y_true_label_index, y_pred_label_index):
+        print("y_true_label_index")
+        print(y_true_label_index)
+        print("y_pred_label_index")
+        print(y_pred_label_index)
         score = 0.5
         return score
-    def score_function(self, ground_truths, predictions, valid_indexes=[0]):
-        print ("ground truths")
-        print(ground_truths)
-        print("predictions")
-        print(predictions)
-        return self(ground_truths, predictions)
+
 
 
 
 problem_title = 'Mars craters detection and classification'
 # A type (class) which will be used to create wrapper objects for y_pred
-Predictions = rw.prediction_types.make_detection()
+dummypd = dummy_Predictions
+Predictions = dummypd
 # An object implementing the workflow
 print ('this works?')
 workflow = rw.workflows.ObjectDetector()
@@ -56,10 +88,10 @@ def get_cv(X, y):
     n_tot = len(X)
     n1 = n_tot // 3
     n2 = n1 * 2
-
+    #first entry in tuple is for training, the second for testing
+    #number of tuples gives number of crossfolds
     return [
-            (np.r_[n1:n_tot], np.r_[0:n1]),
-            (np.r_[0:n1, n2:n_tot], np.r_[n1:n2])]
+            (np.r_[0:n_tot], np.r_[0:n_tot])]
 
 
 class MCVertex:

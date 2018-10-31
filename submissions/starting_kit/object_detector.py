@@ -30,17 +30,17 @@ class XYZPoint(Structure):
               ("z",c_float)]
 
 class VertexBase(Structure):
-    _fields_=[("x",c_float),
-              ("y",c_float),
-              ("z",c_float),
-              ("c00",c_float),
-              ("c10",c_float),
-              ("c11",c_float),
-              ("c20",c_float),
-              ("c21",c_float),
-              ("c22",c_float),
-              ("chi2",c_float),
-              ("ndof",c_float)]
+    _fields_=[("x",c_double),
+              ("y",c_double),
+              ("z",c_double),
+              ("c00",c_double),
+              ("c10",c_double),
+              ("c11",c_double),
+              ("c20",c_double),
+              ("c21",c_double),
+              ("c22",c_double),
+              ("chi2",c_double),
+              ("ndof",c_int)]
 
 class MCVertex(Structure):
     _fields_=[("x",c_float),
@@ -79,12 +79,13 @@ class ObjectDetector:
 
     def predict(self, X):
         #loop over all events saved in X
+        #list of of lists of all reconstructed vertices
+        all_rec_vertex_list = []
         for velo_state_list in X:
           velo_states_in_event = []
           for velo_state in velo_state_list:
             velo_state_cov = velo_state[1]
             velo_state = velo_state[0]
-            print(velo_state.x)
             full_velo_state = make_new_velostate()
             full_velo_state.x = velo_state.x
             full_velo_state.y = velo_state.y
@@ -121,19 +122,62 @@ class ObjectDetector:
           # There must be a neater way to do this but I haven't found it
           # basically the above multiplication defines a construction for
           # the array, then you must instantiate it
+          a  = host_velo_states()
+          print(X.shape)
+          print("len(velo_states_in_event)")
+          print(len(velo_states_in_event))
+          for i in range(0, len(velo_states_in_event)):
+            a[i] = velo_states_in_event[i]
+            print("x", a[i].x)
+            print("y", a[i].y)
+            print("z", a[i].z)
+            print("tx", a[i].tx)
+            print("ty", a[i].ty)
+          print("len(velo_states_in_event)", len(velo_states_in_event))
+          print ("len a",len(a))
+          
+          
+
           read_mcvertices = mcvertices_all()
           read_velo_states = host_velo_states()
           read_tracks2disable = tracks2disable()
           recod_outvtxvec = outvtxvec()
           recod_seeds = seeds()
-          lib.reconstructMultiPVFromTracks(velo_states_in_event, recod_outvtxvec, 
+
+          filename='/home/freiss/lxplus_work/public/recept/RAPID-data3/data/RapidVPData_6719289_74672.json'
+          number_of_tracks = lib.readTracks(read_velo_states, filename.encode())
+          print("read velo states x", read_velo_states[0].x)
+          print("a velo states x", a[0].x)
+          print("read velo states y", read_velo_states[0].y)
+          print("a velo states y", a[0].y)
+          print("read velo states z", read_velo_states[0].z)
+          print("a velo states z", a[0].z)
+          print("read velo states tx", read_velo_states[0].tx)
+          print("a velo states tx", a[0].tx)
+          print("read velo states ty", read_velo_states[0].ty)
+          print("a velo states ty", a[0].ty)
+          print("number tracks", number_of_tracks)
+          #number_vertex = lib.reconstructMultiPVFromTracks(a, recod_outvtxvec, 
+           #                                         read_tracks2disable, recod_seeds, len(velo_states_in_event))
+          
+
+          number_vertex = lib.reconstructMultiPVFromTracks(read_velo_states, recod_outvtxvec, 
                                                     read_tracks2disable, recod_seeds, len(velo_states_in_event))
+          
+          rec_vertex_in_event = []
+          print("number vertex", number_vertex)
+          for i in range (0, number_vertex):
+            vertex_tuple = (1., recod_outvtxvec[i].x, recod_outvtxvec[i].y, recod_outvtxvec[i].z)
+          #  vertex_tuple = (1., recod_outvtxvec[i])
+            rec_vertex_in_event = rec_vertex_in_event + [vertex_tuple]
+          all_rec_vertex_list = all_rec_vertex_list + [rec_vertex_in_event]
+
 
 
 
         #lib.reconstructMultiPVFromTracks(read_velo_states, recod_outvtxvec, 
          #                                           read_tracks2disable, recod_seeds, number_of_tracks)
-        y_pred = [[(1.0, 112.0, 112.0, 112.0)] for img in X]
+        y_pred =  all_rec_vertex_list
         # convert output into an np.array of objects
         y_pred_array = np.empty(len(y_pred), dtype=object)
         y_pred_array[:] = y_pred
