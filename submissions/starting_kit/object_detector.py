@@ -7,7 +7,7 @@ from ctypes import *
 from array import array
 
 #does this work on different architectures?
-lib = cdll.LoadLibrary('/home/freiss/RAPID-data/build/baseline/libRAMP.so')
+lib = cdll.LoadLibrary('submissions/starting_kit/libRAMP.so')
 
 class VeloState(Structure):
     _fields_=[("x",c_float),
