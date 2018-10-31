@@ -26,19 +26,24 @@ class dummy_Predictions(BasePrediction):
     return 'y_pred = {}'.format(self.y_pred)
 
   @classmethod
+
+  #combination at the moment dummy implementation
   def combine(cls, predictions_list, index_list=None):
     if index_list is None:  # we combine the full list
       index_list = range(len(predictions_list))
     y_comb_list = [predictions_list[i].y_pred for i in index_list]
 
-    n_preds = len(y_comb_list[0])
+    n_preds = len(y_comb_list)
     y_preds_combined = np.empty(n_preds, dtype=object)
-    combined_predictions = cls(y_pred=y_preds_combined)
+    #combined_predictions = cls(y_pred=predictions_list)
+    combined_predictions = cls(y_pred=predictions_list[0].y_pred)
     return combined_predictions
 
   @property
   def valid_indexes(self):
-    return True
+    return self.y_pred != np.empty(len(self.y_pred), dtype=np.object)
+    #return True
+
 
 class dummy_score(BaseScoreType):
     is_lower_the_better = False
@@ -50,12 +55,25 @@ class dummy_score(BaseScoreType):
         self.precision = precision
 
     def __call__(self, y_true_label_index, y_pred_label_index):
-        print("y_true_label_index")
+        print("y_true_label_index", type(y_true_label_index[0][0]), y_true_label_index.shape)
         print(y_true_label_index)
-        print("y_pred_label_index")
+        print("y_pred_label_index", type(y_pred_label_index[0][0]), y_pred_label_index.shape)
         print(y_pred_label_index)
+        #we can us the python PVChecker -> need to transform data for it
+        MC_PVs = y_true_label_index[0]
+        print(MC_PVs)
+        print(MC_PVs[0].x)
+       # for MC_PV in MC_PVs:
+         # print(MC_PV.x, MC_PV.y, MC_PV.z, MC_PV.numberTracks)
+
         score = 0.5
         return score
+
+    def check_y_pred_dimensions(self, y_true, y_pred):
+      print("len true", y_true.shape)
+      print("len pred", y_pred.shape)
+      if len(y_true) != len(y_pred):
+        raise ValueError('sWrong y_pred dimensions: y_pred should have {} instances, ''instead it has {} instances'.format(len(y_true), len(y_pred)))
 
 
 
@@ -95,10 +113,11 @@ def get_cv(X, y):
 
 
 class MCVertex:
-  def __init__(self, x, y, z):
+  def __init__(self, x, y, z, numberTracks):
     self.x = x
     self.y = y
     self.z = z
+    self.numberTracks = numberTracks
   def __repr__(self):
       #return '{0}, {1}, {2}'.format(self.x, self.y, self.z)
       return 'MCVertex'
@@ -161,7 +180,7 @@ def _read_data(path, bla='bla'):
       MCVertices  = jdata['MCVertices']
       #mc_pvs = np.array([ np.array(h['Pos'] + [h['products']] ) for key,h in MCVertices.items() ])
       #mc_pvs = [ tuple(h['Pos'] + [h['products']] ) for key,h in MCVertices.items() ]
-      mc_pvs = [ MCVertex(*h['Pos'] ) for key,h in MCVertices.items() ]
+      mc_pvs = [ MCVertex(*h['Pos'], + h['products'] ) for key,h in MCVertices.items() ]
       list_y = list_y + [mc_pvs]
 
       VeloTracks  = jdata['VeloTracks']

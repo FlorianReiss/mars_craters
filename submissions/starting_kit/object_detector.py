@@ -161,7 +161,7 @@ class ObjectDetector:
            #                                         read_tracks2disable, recod_seeds, len(velo_states_in_event))
           
 
-          number_vertex = lib.reconstructMultiPVFromTracks(read_velo_states, recod_outvtxvec, 
+          number_vertex = lib.reconstructMultiPVFromTracks(a, recod_outvtxvec, 
                                                     read_tracks2disable, recod_seeds, len(velo_states_in_event))
           
           rec_vertex_in_event = []
