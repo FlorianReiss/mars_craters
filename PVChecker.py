@@ -27,7 +27,7 @@ class PVChecker:
   def __init__(self):
     
     #configuration for matching
-    self.m_mintracks = 1
+    self.m_mintracks = 10
     self.m_distance = 0.3
 
     #data frames to collect all rec and true pvs from all events
@@ -122,7 +122,7 @@ class PVChecker:
     print ("have", counter_fake_PV, "fake PVs")
     print ("fake rate:", self.total_fake_rate)
 
-  
+
   #function to get determine total score
   def final_score(self):
     #critertia: efficiency, fake rate, sigma of residuals, means of residuals?

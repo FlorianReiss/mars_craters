@@ -8,91 +8,20 @@ import json
 from rampwf.prediction_types.base import BasePrediction
 from rampwf.score_types import BaseScoreType 
 
-from PVChecker import *
-
-
-class dummy_Predictions(BasePrediction):
-  def __init__(self, y_pred=None, y_true=None, n_samples=None):
-    if y_pred is not None:
-      self.y_pred = y_pred
-    elif y_true is not None:
-      self.y_pred = y_true
-    elif n_samples is not None:
-      self.y_pred = np.empty(n_samples, dtype=object)
-    else:
-     raise ValueError('Missing init argument: y_pred, y_true, or n_samples')
-
-  def __str__(self):
-    return 'y_pred = {}'.format(self.y_pred)
-
-  @classmethod
-
-  #combination at the moment dummy implementation
-  def combine(cls, predictions_list, index_list=None):
-    if index_list is None:  # we combine the full list
-      index_list = range(len(predictions_list))
-    y_comb_list = [predictions_list[i].y_pred for i in index_list]
-
-    n_preds = len(y_comb_list)
-    y_preds_combined = np.empty(n_preds, dtype=object)
-    #combined_predictions = cls(y_pred=predictions_list)
-    combined_predictions = cls(y_pred=predictions_list[0].y_pred)
-    return combined_predictions
-
-  @property
-  def valid_indexes(self):
-    return self.y_pred != np.empty(len(self.y_pred), dtype=np.object)
-    #return True
-
-
-class dummy_score(BaseScoreType):
-    is_lower_the_better = False
-    minimum = 0.0
-    maximum = 1.0
-
-    def __init__(self, name='dummy score', precision=2):
-        self.name = name
-        self.precision = precision
-
-    def __call__(self, y_true_label_index, y_pred_label_index):
-        #we can us the python PVChecker -> need to transform data for it
-
-        
-        checker = PVChecker()
-        #for MC_PVs in y_true_label_index:
-        #loop over event
-        for i_event in range(0, len(y_true_label_index)):
-          MCPV_arr_tot = []
-          RecPV_arr_tot = []
-          #set-up MC PVs
-          for MC_PV in y_true_label_index[i_event]:
-            MCPV_arr = np.array([MC_PV.x, MC_PV.y, MC_PV.z, MC_PV.numberTracks])
-            MCPV_arr_tot = MCPV_arr_tot + [MCPV_arr]
-          #set-up reconstructed PVs
-          for Rec_PV in y_pred_label_index[i_event]:
-            RecPV_arr = np.array(Rec_PV)
-            RecPV_arr_tot =  RecPV_arr_tot + [RecPV_arr]
-          MCPV_arr_tot = np.array(MCPV_arr_tot)
-          RecPV_arr_tot = np.array(RecPV_arr_tot)
-          checker.load_data(RecPV_arr_tot, MCPV_arr_tot)
-          checker.check_event_df()
-
-        #checker = PVChecker
-        checker.calculate_eff()
-        
-        return checker.reconstructible_efficiency
-
-    def check_y_pred_dimensions(self, y_true, y_pred):
-      if len(y_true) != len(y_pred):
-        raise ValueError('sWrong y_pred dimensions: y_pred should have {} instances, ''instead it has {} instances'.format(len(y_true), len(y_pred)))
+# our custom implementations for predictions and scoring
+from PVPredictions import PVPredictions
+from PVScore import PVScore
 
 
 
 
-problem_title = 'Mars craters detection and classification'
+
+
+
+problem_title = 'Primary vertex reconstruction'
 # A type (class) which will be used to create wrapper objects for y_pred
-dummypd = dummy_Predictions
-Predictions = dummypd
+
+Predictions = PVPredictions
 # An object implementing the workflow
 workflow = rw.workflows.ObjectDetector()
 
@@ -100,11 +29,9 @@ workflow = rw.workflows.ObjectDetector()
 # The scoring region is chosen so that despite the overlap,
 # no crater is scored twice, hence the boundaries of
 # 28 = 56 / 2 and 196 = 224 - 56 / 2
-minipatch = [28, 196, 28, 196]
 
 score_types = [
-   
-    dummy_score()
+    PVScore()
 ]
 
 
@@ -174,7 +101,8 @@ def _read_data(path, bla='bla'):
     Returns
     -------
     X, y data
-
+    X: np array of lists of tuples, where a tuple consists of (VeloState, CovMatrix), a list contains all states of an event, and the array contains the lists all events
+    Y: np array of lists of MCVertex, where a list contains all MC vertices of an event, and the array contains the lists of all events
     """
     #loop over all json files:
 
@@ -209,16 +137,17 @@ def _read_data(path, bla='bla'):
     x_array = np.empty(len(list_x), dtype=object)
     x_array[:] = list_x
     x_array = np.array(x_array)
+    print(x_array)
     return x_array, y_array
     #return np.array([[(1,2)],[(1,2)]]),np.array([[(2,3)],[(1,2)]])
 
 
-def get_test_data(path='/home/freiss/lxplus_work/public/recept/RAPID-data3/'):
+def get_test_data(path='./data/'):
     return _read_data(path, 'test')
     #return np.array([1]),np.array([2])
 
 
-def get_train_data(path='/home/freiss/lxplus_work/public/recept/RAPID-data3/'):
+def get_train_data(path='./data/'):
     return _read_data(path, 'train')
 
 
