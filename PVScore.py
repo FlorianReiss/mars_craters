@@ -8,7 +8,7 @@ class PVScore(BaseScoreType):
     minimum = 0.0
     maximum = 1.0
 
-    def __init__(self, name='dummy score', precision=2):
+    def __init__(self, name='PV rec eff', precision=2):
         self.name = name
         self.precision = precision
 
@@ -42,5 +42,5 @@ class PVScore(BaseScoreType):
 
     def check_y_pred_dimensions(self, y_true, y_pred):
       if len(y_true) != len(y_pred):
-        raise ValueError('sWrong y_pred dimensions: y_pred should have {} instances, ''instead it has {} instances'.format(len(y_true), len(y_pred)))
+        raise ValueError('Wrong y_pred dimensions: y_pred should have {} instances, ''instead it has {} instances'.format(len(y_true), len(y_pred)))
 

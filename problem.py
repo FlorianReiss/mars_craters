@@ -13,12 +13,20 @@ from PVPredictions import PVPredictions
 from PVScore import PVScore
 
 
+# ramp-kit for the RAPID challenge
+# test and train data should be in data/test and data/train
+# one has to implement the ObjectDetector class in submissions/<yoursubmission>/object_detector.py
+# with the functions fit(X,y) and predict(X), where X is the input data and y the truth information
+# the fit function contains the training of the model, while the predict function applies it
+
+
+#to do: implement various scoring algorithms
+#to do: decide on crossfolds, prediction
 
 
 
 
-
-problem_title = 'Primary vertex reconstruction'
+problem_title = 'RAPID challenge'
 # A type (class) which will be used to create wrapper objects for y_pred
 
 Predictions = PVPredictions
@@ -89,7 +97,7 @@ class VeloState_Cov:
         return 'Cov'
 
 
-def _read_data(path, bla='bla'):
+def _read_data(path, type):
     """
     Read and process data and labels.
 
@@ -110,7 +118,7 @@ def _read_data(path, bla='bla'):
     list_x = []
     #default path is .
     #have to set it for reading
-    path = path + '/data/'
+    path = path + '/data/{0}/'.format(type)
     for file in os.listdir(path):
       if not file.endswith('.json'): continue
       file_path = path + file
@@ -142,7 +150,7 @@ def _read_data(path, bla='bla'):
     #return np.array([[(1,2)],[(1,2)]]),np.array([[(2,3)],[(1,2)]])
 
 
-def get_test_data(path='./data/'):
+def get_test_data(path):
     return _read_data(path, 'test')
     #return np.array([1]),np.array([2])
 
