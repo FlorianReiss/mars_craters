@@ -55,14 +55,8 @@ class dummy_score(BaseScoreType):
         self.precision = precision
 
     def __call__(self, y_true_label_index, y_pred_label_index):
-        print("y_true_label_index", type(y_true_label_index[0][0]), y_true_label_index.shape)
-        print(y_true_label_index)
-        print("y_pred_label_index", type(y_pred_label_index[0][0]), y_pred_label_index.shape)
-        print(y_pred_label_index)
         #we can us the python PVChecker -> need to transform data for it
-        MC_PVs = y_true_label_index[0]
-        print(MC_PVs)
-        print(MC_PVs[0].x)
+
         
         checker = PVChecker()
         #for MC_PVs in y_true_label_index:
@@ -72,31 +66,23 @@ class dummy_score(BaseScoreType):
           RecPV_arr_tot = []
           #set-up MC PVs
           for MC_PV in y_true_label_index[i_event]:
-            print(MC_PV.x, MC_PV.y, MC_PV.z, MC_PV.numberTracks)
             MCPV_arr = np.array([MC_PV.x, MC_PV.y, MC_PV.z, MC_PV.numberTracks])
             MCPV_arr_tot = MCPV_arr_tot + [MCPV_arr]
-            print("predict", y_pred_label_index[i_event])
           #set-up reconstructed PVs
           for Rec_PV in y_pred_label_index[i_event]:
             RecPV_arr = np.array(Rec_PV)
             RecPV_arr_tot =  RecPV_arr_tot + [RecPV_arr]
-          print("MCPV array")
           MCPV_arr_tot = np.array(MCPV_arr_tot)
-          print(MCPV_arr_tot)
           RecPV_arr_tot = np.array(RecPV_arr_tot)
-          print("RecPV array")
-          print(RecPV_arr_tot)
           checker.load_data(RecPV_arr_tot, MCPV_arr_tot)
           checker.check_event_df()
 
         #checker = PVChecker
-        checker.print_eff()
+        checker.calculate_eff()
         
         return checker.reconstructible_efficiency
 
     def check_y_pred_dimensions(self, y_true, y_pred):
-      print("len true", y_true.shape)
-      print("len pred", y_pred.shape)
       if len(y_true) != len(y_pred):
         raise ValueError('sWrong y_pred dimensions: y_pred should have {} instances, ''instead it has {} instances'.format(len(y_true), len(y_pred)))
 
@@ -108,7 +94,6 @@ problem_title = 'Mars craters detection and classification'
 dummypd = dummy_Predictions
 Predictions = dummypd
 # An object implementing the workflow
-print ('this works?')
 workflow = rw.workflows.ObjectDetector()
 
 # The overlap between adjacent patches is 56 pixels
@@ -224,10 +209,6 @@ def _read_data(path, bla='bla'):
     x_array = np.empty(len(list_x), dtype=object)
     x_array[:] = list_x
     x_array = np.array(x_array)
-    print("print x array")
-    print(x_array)
-    print((type(x_array)))
-    print((type(x_array[0])))
     return x_array, y_array
     #return np.array([[(1,2)],[(1,2)]]),np.array([[(2,3)],[(1,2)]])
 

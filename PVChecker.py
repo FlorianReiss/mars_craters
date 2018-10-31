@@ -91,6 +91,18 @@ class PVChecker:
     self.df_all_events_fake_rec_pvs = self.df_all_events_fake_rec_pvs.append(self.df_fake_rec_pvs, ignore_index=True)
     self.df_all_events_mc_pvs       = self.df_all_events_mc_pvs.append(self.df_mc_pvs, ignore_index=True)
 
+  def calculate_eff(self):
+    #use total data frames to count found/total PVs
+    counter_found_MC_PV = self.df_all_events_true_rec_pvs.index.size
+    counter_total_MC_PV = self.df_all_events_mc_pvs.index.size
+    counter_total_MC_PV_reconstructible = self.df_all_events_mc_pvs[self.df_all_events_mc_pvs.nVeloTracks > self.m_mintracks].index.size
+    #counter_total_MC_PV = self.df_all_events_mc_pvs.index.size
+    counter_fake_PV = self.df_all_events_fake_rec_pvs.index.size
+
+    self.total_efficiency = counter_found_MC_PV/counter_total_MC_PV
+    self.total_fake_rate = counter_fake_PV/(counter_found_MC_PV + counter_fake_PV)
+    self.reconstructible_efficiency = counter_found_MC_PV/counter_total_MC_PV_reconstructible
+
   #print efficiencies and fake rate
   def print_eff(self):
     #use total data frames to count found/total PVs
@@ -109,6 +121,8 @@ class PVChecker:
     print ("reconstructible PV efficiency: ", self.reconstructible_efficiency)
     print ("have", counter_fake_PV, "fake PVs")
     print ("fake rate:", self.total_fake_rate)
+
+  
   #function to get determine total score
   def final_score(self):
     #critertia: efficiency, fake rate, sigma of residuals, means of residuals?

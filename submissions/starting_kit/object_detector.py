@@ -67,14 +67,6 @@ class ObjectDetector:
         pass
 
     def fit(self, X, y):
-        print("X")
-        print(X)
-        partx = X[0]
-        for bla in partx:
-          print( bla[0])
-        
-        print("y")
-        print(y)
         return self
 
     def predict(self, X):
@@ -123,18 +115,8 @@ class ObjectDetector:
           # basically the above multiplication defines a construction for
           # the array, then you must instantiate it
           a  = host_velo_states()
-          print(X.shape)
-          print("len(velo_states_in_event)")
-          print(len(velo_states_in_event))
           for i in range(0, len(velo_states_in_event)):
             a[i] = velo_states_in_event[i]
-            print("x", a[i].x)
-            print("y", a[i].y)
-            print("z", a[i].z)
-            print("tx", a[i].tx)
-            print("ty", a[i].ty)
-          print("len(velo_states_in_event)", len(velo_states_in_event))
-          print ("len a",len(a))
           
           
 
@@ -144,19 +126,7 @@ class ObjectDetector:
           recod_outvtxvec = outvtxvec()
           recod_seeds = seeds()
 
-          filename='/home/freiss/lxplus_work/public/recept/RAPID-data3/data/RapidVPData_6719289_74672.json'
-          number_of_tracks = lib.readTracks(read_velo_states, filename.encode())
-          print("read velo states x", read_velo_states[0].x)
-          print("a velo states x", a[0].x)
-          print("read velo states y", read_velo_states[0].y)
-          print("a velo states y", a[0].y)
-          print("read velo states z", read_velo_states[0].z)
-          print("a velo states z", a[0].z)
-          print("read velo states tx", read_velo_states[0].tx)
-          print("a velo states tx", a[0].tx)
-          print("read velo states ty", read_velo_states[0].ty)
-          print("a velo states ty", a[0].ty)
-          print("number tracks", number_of_tracks)
+
           #number_vertex = lib.reconstructMultiPVFromTracks(a, recod_outvtxvec, 
            #                                         read_tracks2disable, recod_seeds, len(velo_states_in_event))
           
@@ -165,7 +135,7 @@ class ObjectDetector:
                                                     read_tracks2disable, recod_seeds, len(velo_states_in_event))
           
           rec_vertex_in_event = []
-          print("number vertex", number_vertex)
+
           for i in range (0, number_vertex):
             vertex_tuple = ( recod_outvtxvec[i].x, recod_outvtxvec[i].y, recod_outvtxvec[i].z)
           #  vertex_tuple = (1., recod_outvtxvec[i])
