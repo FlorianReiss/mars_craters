@@ -63,11 +63,36 @@ class dummy_score(BaseScoreType):
         MC_PVs = y_true_label_index[0]
         print(MC_PVs)
         print(MC_PVs[0].x)
-       # for MC_PV in MC_PVs:
-         # print(MC_PV.x, MC_PV.y, MC_PV.z, MC_PV.numberTracks)
+        
+        checker = PVChecker()
+        #for MC_PVs in y_true_label_index:
+        #loop over event
+        for i_event in range(0, len(y_true_label_index)):
+          MCPV_arr_tot = []
+          RecPV_arr_tot = []
+          #set-up MC PVs
+          for MC_PV in y_true_label_index[i_event]:
+            print(MC_PV.x, MC_PV.y, MC_PV.z, MC_PV.numberTracks)
+            MCPV_arr = np.array([MC_PV.x, MC_PV.y, MC_PV.z, MC_PV.numberTracks])
+            MCPV_arr_tot = MCPV_arr_tot + [MCPV_arr]
+            print("predict", y_pred_label_index[i_event])
+          #set-up reconstructed PVs
+          for Rec_PV in y_pred_label_index[i_event]:
+            RecPV_arr = np.array(Rec_PV)
+            RecPV_arr_tot =  RecPV_arr_tot + [RecPV_arr]
+          print("MCPV array")
+          MCPV_arr_tot = np.array(MCPV_arr_tot)
+          print(MCPV_arr_tot)
+          RecPV_arr_tot = np.array(RecPV_arr_tot)
+          print("RecPV array")
+          print(RecPV_arr_tot)
+          checker.load_data(RecPV_arr_tot, MCPV_arr_tot)
+          checker.check_event_df()
 
-        score = 0.5
-        return score
+        #checker = PVChecker
+        checker.print_eff()
+        
+        return checker.reconstructible_efficiency
 
     def check_y_pred_dimensions(self, y_true, y_pred):
       print("len true", y_true.shape)

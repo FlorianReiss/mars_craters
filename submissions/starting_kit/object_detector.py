@@ -167,7 +167,7 @@ class ObjectDetector:
           rec_vertex_in_event = []
           print("number vertex", number_vertex)
           for i in range (0, number_vertex):
-            vertex_tuple = (1., recod_outvtxvec[i].x, recod_outvtxvec[i].y, recod_outvtxvec[i].z)
+            vertex_tuple = ( recod_outvtxvec[i].x, recod_outvtxvec[i].y, recod_outvtxvec[i].z)
           #  vertex_tuple = (1., recod_outvtxvec[i])
             rec_vertex_in_event = rec_vertex_in_event + [vertex_tuple]
           all_rec_vertex_list = all_rec_vertex_list + [rec_vertex_in_event]

@@ -37,7 +37,7 @@ class PVChecker:
 
 
   #load data
-  #here we expect arr_rec_pvs to be numpy array of array[x,y,z] and arr_mc_pvs to be numpy array of array[x,y,z]
+  #here we expect arr_rec_pvs to be numpy array of array[x,y,z] and arr_mc_pvs to be numpy array of array[x,y,z, nTracks]
   def load_data(self, arr_rec_pvs, arr_mc_pvs):
     self.df_rec_pvs = pd.DataFrame(arr_rec_pvs)
     self.df_rec_pvs['matched'] = 0
@@ -45,7 +45,7 @@ class PVChecker:
     self.df_rec_pvs['matched_pv_key'] = -99
     self.df_rec_pvs.columns=['x', 'y', 'z','matched', 'matched_pv_key']
     self.df_mc_pvs = pd.DataFrame(arr_mc_pvs)
-    self.df_mc_pvs.columns=['x', 'y', 'z','nTracks','nVeloTracks','nAllTracks']
+    self.df_mc_pvs.columns=['x', 'y', 'z','nVeloTracks']
 
   
 
