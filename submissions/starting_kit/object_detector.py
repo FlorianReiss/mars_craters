@@ -73,11 +73,13 @@ class ObjectDetector:
         #loop over all events saved in X
         #list of of lists of all reconstructed vertices
         all_rec_vertex_list = []
-        for velo_state_list in X:
+        #loop over events
+        for event in X:
           velo_states_in_event = []
-          for velo_state in velo_state_list:
-            velo_state_cov = velo_state[1]
-            velo_state = velo_state[0]
+          #loop over velo states in event
+          for velo_state in event.tracks:
+            #velo_state_cov = velo_state[1]
+            #velo_state = velo_state[0]
             full_velo_state = make_new_velostate()
             full_velo_state.x = velo_state.x
             full_velo_state.y = velo_state.y
@@ -86,12 +88,12 @@ class ObjectDetector:
             full_velo_state.tx = velo_state.tx
             full_velo_state.ty = velo_state.ty
 
-            full_velo_state.c00 = velo_state_cov.cov_x
-            full_velo_state.c20 = velo_state_cov.cov_xtx
-            full_velo_state.c22 = velo_state_cov.cov_tx
-            full_velo_state.c11 = velo_state_cov.cov_y
-            full_velo_state.c31 = velo_state_cov.cov_xtx
-            full_velo_state.c33 = velo_state_cov.cov_ty
+            full_velo_state.c00 = velo_state.cov_x
+            full_velo_state.c20 = velo_state.cov_xtx
+            full_velo_state.c22 = velo_state.cov_tx
+            full_velo_state.c11 = velo_state.cov_y
+            full_velo_state.c31 = velo_state.cov_xtx
+            full_velo_state.c33 = velo_state.cov_ty
             velo_states_in_event = velo_states_in_event + [full_velo_state]
 
 
