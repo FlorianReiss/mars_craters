@@ -188,7 +188,7 @@ def get_test_data(path):
     #return np.array([1]),np.array([2])
 
 
-def get_train_data(path='./data/'):
+def get_train_data(path):
     return _read_data(path, 'train')
 
 
