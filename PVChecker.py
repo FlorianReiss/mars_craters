@@ -47,6 +47,26 @@ class PVChecker:
     self.df_mc_pvs = pd.DataFrame(arr_mc_pvs)
     self.df_mc_pvs.columns=['x', 'y', 'z','nVeloTracks']
 
+
+  def load_from_ramp (self, y_true_label_index, y_pred_label_index):
+
+        #for MC_PVs in y_true_label_index:
+        #loop over event
+        for i_event in range(0, len(y_true_label_index)):
+          MCPV_arr_tot = []
+          RecPV_arr_tot = []
+          #set-up MC PVs
+          for MC_PV in y_true_label_index[i_event]:
+            MCPV_arr = np.array([MC_PV.x, MC_PV.y, MC_PV.z, MC_PV.numberTracks])
+            MCPV_arr_tot = MCPV_arr_tot + [MCPV_arr]
+          #set-up reconstructed PVs
+          for Rec_PV in y_pred_label_index[i_event]:
+            RecPV_arr = np.array(Rec_PV)
+            RecPV_arr_tot =  RecPV_arr_tot + [RecPV_arr]
+          MCPV_arr_tot = np.array(MCPV_arr_tot)
+          RecPV_arr_tot = np.array(RecPV_arr_tot)
+          self.load_data(RecPV_arr_tot, MCPV_arr_tot)
+          self.check_event_df()
   
 
     #check event with previously loaded data frames

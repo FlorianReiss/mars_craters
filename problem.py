@@ -10,8 +10,7 @@ from rampwf.score_types import BaseScoreType
 
 # our custom implementations for predictions and scoring
 from PVPredictions import PVPredictions
-from PVScore import PVScore
-
+from PVScore import PVScore, PVScore_total
 
 # ramp-kit for the RAPID challenge
 # test and train data should be in data/test and data/train
@@ -38,8 +37,10 @@ workflow = rw.workflows.ObjectDetector()
 # no crater is scored twice, hence the boundaries of
 # 28 = 56 / 2 and 196 = 224 - 56 / 2
 
+
+
 score_types = [
-    PVScore()
+    PVScore(), PVScore_total(name = "efficiency",mode="eff"), PVScore_total(name = "fake rate",mode="fake"), PVScore_total(name = "total",mode="total")
 ]
 
 
